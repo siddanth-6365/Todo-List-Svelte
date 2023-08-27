@@ -1,42 +1,30 @@
-<script lang="ts">
+<script>
   import { listStore, CurrentListStore } from "./stores/todo";
-  import { writable } from 'svelte/store';
 
-  interface ListItem {
-    id: number;
-    title: string;
-    desc: string;
-  }
-
-  let id: number;
-  let selectedItem: ListItem | null = null;
+  let id;
+  let selectedItem= null;
 
   // Subscribe to CurrentListStore and update id
   CurrentListStore.subscribe((value) => {
     id = value;
   });
 
-  const typedListStore = writable<ListItem[]>([]);
-  listStore.subscribe((value) => {
-    typedListStore.set(value);
-  });
-
   $: {
     id = $CurrentListStore;
-    selectedItem = $typedListStore.find((item) => item.id === +id) || null;
+    selectedItem = $listStore.find((item) => item.id === +id);
   }
 
-  function handleTitleChange(event: Event) {
+  function handleTitleChange(event) {
     if (selectedItem) {
-      selectedItem.title = (event.target as HTMLInputElement).value;
-      typedListStore.update((arr) => [...arr]);
+      selectedItem.title = event.target.value;
+      listStore.update((arr) => [...arr]);
     }
   }
 
-  function handleDescChange(event: Event) {
+  function handleDescChange(event) {
     if (selectedItem) {
-      selectedItem.desc = (event.target as HTMLTextAreaElement).value;
-      typedListStore.update((arr) => [...arr]);
+      selectedItem.desc = event.target.value;
+      listStore.update((arr) => [...arr]);
     }
   }
 </script>
@@ -61,7 +49,3 @@
     <p class="text-red-500">Item not found.</p>
   {/if}
 </div>
-
-<style>
-  /* Your styles here */
-</style>
