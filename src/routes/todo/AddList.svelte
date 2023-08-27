@@ -1,8 +1,20 @@
-<script>
+<script lang="ts">
   import { listStore } from "./stores/todo";
+  import { writable } from 'svelte/store';
 
-  let listArr = [];
+  interface ListItem {
+    id: number;
+    title: string;
+    desc: string;
+  }
+
+  const typedListStore = writable<ListItem[]>([]);
   listStore.subscribe((value) => {
+    typedListStore.set(value);
+  });
+
+  let listArr: ListItem[] = [];
+  typedListStore.subscribe((value) => {
     listArr = value;
   });
 
@@ -11,7 +23,7 @@
 
   function AddNewList() {
     if (titleInput && descInput) {
-      const newNote = {
+      const newNote: ListItem = {
         id: Math.floor(Math.random() * 1000),
         title: titleInput,
         desc: descInput,
@@ -31,3 +43,5 @@
   <textarea bind:value={descInput} />
   <button class="mt-4 p-3" on:click={AddNewList}>Add</button>
 </form>
+
+
